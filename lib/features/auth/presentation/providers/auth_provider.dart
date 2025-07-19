@@ -82,15 +82,12 @@ final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
   return AuthRemoteDataSourceImpl(firebaseAuth);
 });
 
-final authLocalDataSourceProvider = Provider<AuthLocalDataSource>((ref) {
+final authLocalDataSourceProvider = FutureProvider<AuthLocalDataSource>((
+  ref,
+) async {
   final secureStorage = ref.read(secureStorageProvider);
   final localAuth = ref.read(localAuthProvider);
-  final prefs = ref.read(sharedPreferencesProvider).value;
-
-  if (prefs == null) {
-    throw Exception('SharedPreferences not initialized');
-  }
-
+  final prefs = await ref.watch(sharedPreferencesProvider.future);
   return AuthLocalDataSourceImpl(
     secureStorage: secureStorage,
     localAuth: localAuth,
@@ -98,10 +95,9 @@ final authLocalDataSourceProvider = Provider<AuthLocalDataSource>((ref) {
   );
 });
 
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
+final authRepositoryProvider = FutureProvider<AuthRepository>((ref) async {
   final remoteDataSource = ref.read(authRemoteDataSourceProvider);
-  final localDataSource = ref.read(authLocalDataSourceProvider);
-
+  final localDataSource = await ref.watch(authLocalDataSourceProvider.future);
   return AuthRepositoryImpl(
     remoteDataSource: remoteDataSource,
     localDataSource: localDataSource,
@@ -109,19 +105,26 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 });
 
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  final repository = ref.read(authRepositoryProvider);
-  return AuthNotifier(repository);
+  return AuthNotifier(ref);
 });
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  final AuthRepository _repository;
+  final Ref ref;
+  AuthRepository? _repository;
 
-  AuthNotifier(this._repository) : super(AuthState.initial()) {
-    _checkAuthStatus();
+  AuthNotifier(this.ref) : super(AuthState.initial()) {
+    _init();
+  }
+
+  Future<void> _init() async {
+    final repoAsync = await ref.watch(authRepositoryProvider.future);
+    _repository = repoAsync;
+    await _checkAuthStatus();
   }
 
   Future<void> _checkAuthStatus() async {
-    final result = await _repository.isAuthenticated();
+    if (_repository == null) return;
+    final result = await _repository!.isAuthenticated();
     result.fold(
       (failure) => state = state.copyWith(
         status: AuthStatus.error,
@@ -138,7 +141,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _getCurrentUser() async {
-    final result = await _repository.getCurrentUser();
+    if (_repository == null) return;
+    final result = await _repository!.getCurrentUser();
     result.fold(
       (failure) => state = state.copyWith(
         status: AuthStatus.error,
@@ -160,9 +164,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> signIn(String email, String password) async {
+    if (_repository == null) return;
     state = state.copyWith(status: AuthStatus.loading);
 
-    final result = await _repository.signInWithEmail(email, password);
+    final result = await _repository!.signInWithEmail(email, password);
 
     result.fold(
       (failure) => state = state.copyWith(
@@ -179,9 +184,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> signUp(String email, String password) async {
+    if (_repository == null) return;
     state = state.copyWith(status: AuthStatus.loading);
 
-    final result = await _repository.signUpWithEmail(email, password);
+    final result = await _repository!.signUpWithEmail(email, password);
 
     result.fold(
       (failure) => state = state.copyWith(
@@ -194,7 +200,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> resetPassword(String email) async {
-    final result = await _repository.resetPassword(email);
+    if (_repository == null) return;
+    final result = await _repository!.resetPassword(email);
 
     result.fold(
       (failure) => state = state.copyWith(
@@ -206,7 +213,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> setPin(String pin) async {
-    final result = await _repository.setPin(pin);
+    if (_repository == null) return;
+    final result = await _repository!.setPin(pin);
 
     result.fold(
       (failure) => state = state.copyWith(
@@ -218,7 +226,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> verifyPin(String pin) async {
-    final result = await _repository.verifyPin(pin);
+    if (_repository == null) return;
+    final result = await _repository!.verifyPin(pin);
 
     result.fold(
       (failure) => state = state.copyWith(
@@ -239,7 +248,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> enableBiometric() async {
-    final result = await _repository.enableBiometric();
+    if (_repository == null) return;
+    final result = await _repository!.enableBiometric();
 
     result.fold(
       (failure) => state = state.copyWith(
@@ -251,7 +261,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> authenticateWithBiometric() async {
-    final result = await _repository.authenticateWithBiometric();
+    if (_repository == null) return;
+    final result = await _repository!.authenticateWithBiometric();
 
     result.fold(
       (failure) => state = state.copyWith(
@@ -272,9 +283,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> signOut() async {
+    if (_repository == null) return;
     state = state.copyWith(status: AuthStatus.loading);
 
-    final result = await _repository.signOut();
+    final result = await _repository!.signOut();
 
     result.fold(
       (failure) => state = state.copyWith(
