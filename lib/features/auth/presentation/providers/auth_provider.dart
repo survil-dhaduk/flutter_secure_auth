@@ -167,9 +167,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (_repository == null) return;
     state = state.copyWith(status: AuthStatus.loading);
 
-    final result = await _repository!.signInWithEmail(email, password);
+    final result = await _repository?.signInWithEmail(email, password);
 
-    result.fold(
+    result?.fold(
       (failure) => state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: failure.message,
@@ -214,9 +214,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> setPin(String pin) async {
     if (_repository == null) return;
-    final result = await _repository!.setPin(pin);
+    final result = await _repository?.setPin(pin);
 
-    result.fold(
+    result?.fold(
       (failure) => state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: failure.message,

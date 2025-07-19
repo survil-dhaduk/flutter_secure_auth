@@ -9,6 +9,13 @@ import '../../features/auth/presentation/pages/biometric_setup_page.dart';
 import '../../features/auth/presentation/pages/home_page.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 
+// Constants for route names
+const String loginRoute = '/login';
+const String pinSetupRoute = '/pin-setup';
+const String pinEntryRoute = '/pin-entry';
+const String biometricSetupRoute = '/biometric-setup';
+const String homeRoute = '/home';
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
 
@@ -18,51 +25,44 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isAuthenticated = authState.status == AuthStatus.authenticated;
       final isPinSet = authState.isPinSet;
       final isBiometricEnabled = authState.isBiometricEnabled;
-      final isLoading = authState.status == AuthStatus.loading;
-      final isInitial = authState.status == AuthStatus.initial;
-
-      // Don't redirect while loading or initial
-      if (isLoading || isInitial) {
-        return null;
-      }
 
       // If not authenticated, go to login
       if (!isAuthenticated) {
-        return '/login';
+        return loginRoute;
       }
 
       // If authenticated but PIN not set, go to PIN setup
       if (isAuthenticated && !isPinSet) {
-        return '/pin-setup';
+        return pinSetupRoute;
       }
 
       // If authenticated and PIN set but biometric not enabled, go to biometric setup
       if (isAuthenticated && isPinSet && !isBiometricEnabled) {
-        return '/biometric-setup';
+        return biometricSetupRoute;
       }
 
       // If authenticated and everything is set up, go to home
       if (isAuthenticated && isPinSet) {
-        return '/home';
+        return homeRoute;
       }
 
       return null;
     },
     routes: [
-      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(path: loginRoute, builder: (context, state) => const LoginPage()),
       GoRoute(
-        path: '/pin-setup',
+        path: pinSetupRoute,
         builder: (context, state) => const PinSetupPage(),
       ),
       GoRoute(
-        path: '/pin-entry',
+        path: pinEntryRoute,
         builder: (context, state) => const PinEntryPage(),
       ),
       GoRoute(
-        path: '/biometric-setup',
+        path: biometricSetupRoute,
         builder: (context, state) => const BiometricSetupPage(),
       ),
-      GoRoute(path: '/home', builder: (context, state) => const HomePage()),
+      GoRoute(path: homeRoute, builder: (context, state) => const HomePage()),
     ],
     errorBuilder: (context, state) => Scaffold(
       body: Center(
