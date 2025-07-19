@@ -60,4 +60,17 @@ class AppConstants {
   static const String loginErrorSnack = 'An error occurred';
   static const String loginCreatingAccount = 'Creating account...';
   static const String loginSigningIn = 'Signing in...';
+
+  // PIN Setup Page Strings
+  static const String pinSetupTitle = 'Set PIN';
+  static const String pinSetupHeader = 'Set your 4-digit PIN';
+  static const String pinSetupDesc =
+      'You will use this to unlock the app and authorize transactions.';
+  static const String pinSetupEnterPin = 'Enter PIN';
+  static const String pinSetupConfirmPin = 'Confirm PIN';
+  static const String pinSetupContinue = 'Continue';
+  static const String pinSetupSkip = 'Skip for now';
+  static const String pinSetupCompleted = 'PIN setup completed!';
+  static const String pinSetupCreatePin = 'Create a 4-digit PIN';
+  static const String pinSetupReenterPin = 'Re-enter your PIN to confirm';
 }

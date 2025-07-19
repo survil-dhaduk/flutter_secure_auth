@@ -17,7 +17,9 @@ class _BiometricSetupPageState extends ConsumerState<BiometricSetupPage> {
   @override
   void initState() {
     super.initState();
-    ref.read(biometricStateProvider.notifier).checkBiometricAvailability();
+    Future.microtask(() {
+      ref.read(biometricStateProvider.notifier).checkBiometricAvailability();
+    });
   }
 
   @override
