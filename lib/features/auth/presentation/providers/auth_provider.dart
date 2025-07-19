@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_secure_auth/features/auth/presentation/providers/biometric_provider.dart';
 import '../../../../core/errors/failures.dart';
 import '../../domain/entities/user.dart' as app_user;
 import '../../domain/repositories/auth_repository.dart';
@@ -19,6 +20,7 @@ class AuthState extends Equatable {
   final String? errorMessage;
   final bool isPinSet;
   final bool isBiometricEnabled;
+  final bool isPinVerify;
 
   const AuthState({
     required this.status,
@@ -26,6 +28,7 @@ class AuthState extends Equatable {
     this.errorMessage,
     this.isPinSet = false,
     this.isBiometricEnabled = false,
+    this.isPinVerify = false,
   });
 
   factory AuthState.initial() {
@@ -38,6 +41,7 @@ class AuthState extends Equatable {
     String? errorMessage,
     bool? isPinSet,
     bool? isBiometricEnabled,
+    bool? isPinVerify,
   }) {
     return AuthState(
       status: status ?? this.status,
@@ -45,6 +49,7 @@ class AuthState extends Equatable {
       errorMessage: errorMessage,
       isPinSet: isPinSet ?? this.isPinSet,
       isBiometricEnabled: isBiometricEnabled ?? this.isBiometricEnabled,
+      isPinVerify: isPinVerify ?? this.isPinVerify,
     );
   }
 
@@ -55,6 +60,7 @@ class AuthState extends Equatable {
     errorMessage,
     isPinSet,
     isBiometricEnabled,
+    isPinVerify,
   ];
 }
 
@@ -125,6 +131,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> _checkAuthStatus() async {
     if (_repository == null) return;
     final result = await _repository!.isAuthenticated();
+    ref.read(biometricStateProvider.notifier).checkBiometricAvailability();
     result.fold(
       (failure) => state = state.copyWith(
         status: AuthStatus.error,
@@ -236,7 +243,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       ),
       (isValid) {
         if (isValid) {
-          state = state.copyWith(status: AuthStatus.authenticated);
+          state = state.copyWith(
+            status: AuthStatus.authenticated,
+            isPinVerify: true,
+          );
         } else {
           state = state.copyWith(
             status: AuthStatus.error,

@@ -4,6 +4,7 @@ class StorageKeys {
   static const String biometricEnabled = 'biometric_enabled';
   static const String authToken = 'auth_token';
   static const String userId = 'user_id';
+  static const String isPinSet = 'is_pin_set';
 
   // Shared Preferences Keys
   static const String isFirstLaunch = 'is_first_launch';

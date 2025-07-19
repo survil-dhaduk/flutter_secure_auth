@@ -18,6 +18,8 @@ abstract class AuthLocalDataSource {
   Future<DateTime?> getLastPinAttempt();
   Future<void> setAuthenticated(bool authenticated);
   Future<bool> isAuthenticated();
+  Future<void> setPinEnabled(bool enabled);
+  Future<bool> isPinEnabled();
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
@@ -49,6 +51,28 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
       return storedPin == pin;
     } catch (e) {
       throw Exception('Failed to verify PIN');
+    }
+  }
+
+  @override
+  Future<void> setPinEnabled(bool enabled) async {
+    try {
+      await _secureStorage.write(
+        key: StorageKeys.isPinSet,
+        value: enabled.toString(),
+      );
+    } catch (e) {
+      throw Exception('Failed to set PIN enabled status');
+    }
+  }
+
+  @override
+  Future<bool> isPinEnabled() async {
+    try {
+      final enabled = await _secureStorage.read(key: StorageKeys.isPinSet);
+      return enabled == 'true';
+    } catch (e) {
+      return false;
     }
   }
 

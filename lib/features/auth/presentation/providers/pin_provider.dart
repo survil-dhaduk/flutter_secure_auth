@@ -99,17 +99,17 @@ class PinNotifier extends StateNotifier<PinState> {
     state = PinState.initial().copyWith(status: PinStatus.verifying);
   }
 
-  void submitPin() {
+  Future<void> submitPin() async {
     if (state.status == PinStatus.setting) {
       if (state.pin.length != AppConstants.pinLength) {
         state = state.copyWith(
-          errorMessage: 'PIN must be ${AppConstants.pinLength} digits',
+          errorMessage: 'PIN must be  {AppConstants.pinLength} digits',
         );
         return;
       }
 
-      // Move to confirmation
-      state = state.copyWith(status: PinStatus.verifying);
+      // Move to confirmation, clear confirmPin
+      state = state.copyWith(status: PinStatus.verifying, confirmPin: '');
     } else if (state.status == PinStatus.verifying) {
       if (state.confirmPin.length != AppConstants.pinLength) {
         state = state.copyWith(errorMessage: 'Please enter the complete PIN');

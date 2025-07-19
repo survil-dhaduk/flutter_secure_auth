@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_auth/core/router/app_router.dart';
+import 'package:flutter_secure_auth/features/auth/presentation/providers/biometric_provider.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/extensions.dart';
 import '../../../../core/utils/validators.dart';

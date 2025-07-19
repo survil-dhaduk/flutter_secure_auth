@@ -18,7 +18,9 @@ class _PinEntryPageState extends ConsumerState<PinEntryPage> {
   @override
   void initState() {
     super.initState();
-    ref.read(pinStateProvider.notifier).startPinVerification();
+    Future.delayed(Duration.zero, () {
+      ref.read(pinStateProvider.notifier).startPinVerification();
+    });
   }
 
   @override
@@ -29,97 +31,209 @@ class _PinEntryPageState extends ConsumerState<PinEntryPage> {
     ref.listen<AuthState>(authStateProvider, (previous, next) {
       if (next.status == AuthStatus.error) {
         context.showSnackBar(
-          next.errorMessage ?? 'An error occurred',
+          next.errorMessage ?? AppConstants.loginErrorSnack,
           isError: true,
         );
         ref.read(authStateProvider.notifier).clearError();
       }
     });
 
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final pinLength = AppConstants.pinLength;
+    final attemptsLeft = AppConstants.maxPinAttempts - (pinState.attempts);
+
     return LoadingOverlay(
       isLoading: authState.status == AuthStatus.loading,
       message: 'Verifying PIN...',
       child: Scaffold(
-        backgroundColor: context.colorScheme.background,
+        backgroundColor: const Color(0xFFF6F9FC),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppConstants.defaultPadding),
-            child: Column(
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Header
-                      Icon(
-                        Icons.lock_outline,
-                        size: 64,
-                        color: context.colorScheme.primary,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Enter Your PIN',
-                        style: context.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: context.colorScheme.onSurface,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Enter your ${AppConstants.pinLength}-digit PIN to continue',
-                        style: context.textTheme.bodyLarge?.copyWith(
-                          color: context.colorScheme.onSurfaceVariant,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 32),
-
-                      // PIN Input
-                      PinInput(
-                        title: 'PIN',
-                        subtitle:
-                            'Enter your ${AppConstants.pinLength}-digit PIN',
-                        onPinComplete: () async {
-                          await _verifyPin();
-                        },
-                        isVerification: true,
-                      ),
-                    ],
-                  ),
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
                 ),
-
-                // Alternative options
-                Column(
+                child: Row(
                   children: [
-                    TextButton(
-                      onPressed: () {
-                        // Try biometric authentication
-                        _tryBiometric();
-                      },
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: const Color(0xFF1A1A1A),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    Expanded(
                       child: Text(
-                        'Use Biometric',
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: context.colorScheme.primary,
+                        AppConstants.appName,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1A1A1A),
                         ),
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        // Sign out and go back to login
-                        _signOut();
-                      },
-                      child: Text(
-                        'Sign Out',
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: context.colorScheme.error,
-                        ),
-                      ),
-                    ),
+                    const SizedBox(width: 40), // To balance the row
                   ],
                 ),
-              ],
-            ),
+              ),
+              // Main
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 24),
+                        // Lock Icon in colored circle
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF5D5FEF).withOpacity(0.1),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.04),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Container(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF5D5FEF).withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.lock_outline,
+                                  size: 36,
+                                  color: Color(0xFF5D5FEF),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        // Title
+                        Text(
+                          AppConstants.pinSetupEnterPin, // 'Enter your PIN'
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF1A1A1A),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        // Subtitle
+                        Text(
+                          'Enter your $pinLength-digit PIN to continue.',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
+                        // PIN Dots
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(pinLength, (index) {
+                            final isFilled =
+                                (pinState.confirmPin.length > index);
+                            return Container(
+                              margin: EdgeInsets.symmetric(horizontal: 8),
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: isFilled
+                                    ? const Color(0xFF5D5FEF)
+                                    : Colors.grey[300],
+                                shape: BoxShape.circle,
+                              ),
+                            );
+                          }),
+                        ),
+                        // const SizedBox(height: 16),
+                        // Attempts remaining
+                        if (authState.status == AuthStatus.error &&
+                            attemptsLeft > 0)
+                          Text(
+                            '$attemptsLeft attempts remaining',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: const Color(0xFFEF476F),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        if (authState.status != AuthStatus.error ||
+                            attemptsLeft <= 0)
+                          const SizedBox(height: 20),
+                        // const SizedBox(height: 24),
+                        // PIN Input (hidden, but triggers onPinComplete)
+                        PinInput(
+                          title: '',
+                          subtitle: '',
+                          onPinComplete: () async {
+                            await _verifyPin();
+                          },
+                          isVerification: true,
+                        ),
+                        const SizedBox(height: 16),
+                        // Links
+                        Column(
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                // TODO: Implement Forgot PIN
+                              },
+                              child: Text(
+                                'Forgot PIN?',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: const Color(0xFF5D5FEF),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // TODO: Implement Login with Email
+                              },
+                              child: Text(
+                                'Login with Email',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: const Color(0xFF5D5FEF),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Footer
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: Container(
+                    width: 134,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -128,9 +242,15 @@ class _PinEntryPageState extends ConsumerState<PinEntryPage> {
 
   Future<void> _verifyPin() async {
     final pinState = ref.read(pinStateProvider);
-    if (pinState.isConfirmPinComplete) {
-      await ref.read(authStateProvider.notifier).verifyPin(pinState.confirmPin);
-      ref.read(pinStateProvider.notifier).reset();
+
+    await ref.read(pinStateProvider.notifier).submitPin();
+    if (pinState.status == PinStatus.success) {
+      if (pinState.isConfirmPinComplete) {
+        await ref
+            .read(authStateProvider.notifier)
+            .verifyPin(pinState.confirmPin);
+        ref.read(pinStateProvider.notifier).reset();
+      }
     }
   }
 

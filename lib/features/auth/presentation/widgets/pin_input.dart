@@ -24,47 +24,46 @@ class PinInput extends ConsumerWidget {
 
     return Column(
       children: [
-        Text(
-          title,
-          style: context.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: context.colorScheme.onSurface,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          subtitle,
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: context.colorScheme.onSurfaceVariant,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 32),
+        // Text(
+        //   title,
+        //   style: context.textTheme.headlineSmall?.copyWith(
+        //     fontWeight: FontWeight.bold,
+        //     color: context.colorScheme.onSurface,
+        //   ),
+        //   textAlign: TextAlign.center,
+        // ),
+        // const SizedBox(height: 8),
+        // Text(
+        //   subtitle,
+        //   style: context.textTheme.bodyMedium?.copyWith(
+        //     color: context.colorScheme.onSurfaceVariant,
+        //   ),
+        //   textAlign: TextAlign.center,
+        // ),
+        // const SizedBox(height: 32),
 
-        // PIN dots
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            AppConstants.pinLength,
-            (index) => Container(
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color:
-                    index <
-                        (isVerification
-                            ? pinState.confirmPin.length
-                            : pinState.pin.length)
-                    ? context.colorScheme.primary
-                    : context.colorScheme.outline,
-              ),
-            ),
-          ),
-        ),
-
+        // // PIN dots
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: List.generate(
+        //     AppConstants.pinLength,
+        //     (index) => Container(
+        //       margin: const EdgeInsets.symmetric(horizontal: 8),
+        //       width: 20,
+        //       height: 20,
+        //       decoration: BoxDecoration(
+        //         shape: BoxShape.circle,
+        //         color:
+        //             index <
+        //                 (isVerification
+        //                     ? pinState.confirmPin.length
+        //                     : pinState.pin.length)
+        //             ? context.colorScheme.primary
+        //             : context.colorScheme.outline,
+        //       ),
+        //     ),
+        //   ),
+        // ),
         if (pinState.errorMessage != null) ...[
           const SizedBox(height: 16),
           Text(
@@ -76,7 +75,7 @@ class PinInput extends ConsumerWidget {
           ),
         ],
 
-        const SizedBox(height: 32),
+        // const SizedBox(height: 32),
 
         // Number pad
         Column(
@@ -115,13 +114,7 @@ class PinInput extends ConsumerWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {
-                ref.read(pinStateProvider.notifier).submitPin();
-                if (pinState.status == PinStatus.success &&
-                    onPinComplete != null) {
-                  onPinComplete!();
-                }
-              },
+              onPressed: onPinComplete,
               style: ElevatedButton.styleFrom(
                 backgroundColor: context.colorScheme.primary,
                 foregroundColor: context.colorScheme.onPrimary,
@@ -136,6 +129,7 @@ class PinInput extends ConsumerWidget {
                 'Verify PIN',
                 style: context.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
+                  color: context.colorScheme.onPrimary,
                 ),
               ),
             ),

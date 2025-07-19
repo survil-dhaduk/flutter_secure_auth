@@ -15,14 +15,6 @@ class BiometricSetupPage extends ConsumerStatefulWidget {
 
 class _BiometricSetupPageState extends ConsumerState<BiometricSetupPage> {
   @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      ref.read(biometricStateProvider.notifier).checkBiometricAvailability();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
     final biometricState = ref.watch(biometricStateProvider);
@@ -120,6 +112,7 @@ class _BiometricSetupPageState extends ConsumerState<BiometricSetupPage> {
                             'Enable ${biometricState.biometricType}',
                             style: context.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w600,
+                              color: context.colorScheme.onPrimary,
                             ),
                           ),
                         ),

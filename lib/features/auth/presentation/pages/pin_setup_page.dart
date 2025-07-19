@@ -45,9 +45,8 @@ class _PinSetupPageState extends ConsumerState<PinSetupPage> {
     final pinLength = AppConstants.pinLength;
     final enteredPin = pinState.pin;
     final confirmPin = pinState.confirmPin;
-    final isContinueEnabled = isVerifying
-        ? confirmPin.length == pinLength
-        : enteredPin.length == pinLength;
+    final isNextEnabled = isSetting && enteredPin.length == pinLength;
+    final isContinueEnabled = isVerifying && confirmPin.length == pinLength;
 
     return LoadingOverlay(
       isLoading: authState.status == AuthStatus.loading,
@@ -117,13 +116,14 @@ class _PinSetupPageState extends ConsumerState<PinSetupPage> {
                           isActive: isSetting,
                         ),
                         const SizedBox(height: 16),
-                        // PIN Confirm
-                        _PinEntrySection(
-                          label: AppConstants.pinSetupConfirmPin,
-                          pin: confirmPin,
-                          pinLength: pinLength,
-                          isActive: isVerifying,
-                        ),
+                        // PIN Confirm (only show in verifying step)
+                        if (isVerifying)
+                          _PinEntrySection(
+                            label: AppConstants.pinSetupConfirmPin,
+                            pin: confirmPin,
+                            pinLength: pinLength,
+                            isActive: isVerifying,
+                          ),
                         const SizedBox(height: 32),
                         // Keypad
                         _PinKeypad(
@@ -131,41 +131,93 @@ class _PinSetupPageState extends ConsumerState<PinSetupPage> {
                             ref.read(pinStateProvider.notifier).addDigit(val);
                           },
                           onBackspace: () {
-                            ref.read(pinStateProvider.notifier).removeDigit();
+                            if (isVerifying && confirmPin.isEmpty) {
+                              // Reset and return to Step 1
+                              ref.read(pinStateProvider.notifier).reset();
+                              ref
+                                  .read(pinStateProvider.notifier)
+                                  .startPinSetup();
+                            } else {
+                              ref.read(pinStateProvider.notifier).removeDigit();
+                            }
                           },
                           isEnabled: authState.status != AuthStatus.loading,
                         ),
                         const SizedBox(height: 32),
-                        // Continue Button
+                        // Action Button
                         SizedBox(
                           width: double.infinity,
                           height: 56,
-                          child: ElevatedButton(
-                            onPressed: isContinueEnabled
-                                ? () async {
-                                    ref
-                                        .read(pinStateProvider.notifier)
-                                        .submitPin();
-                                    if (pinState.status == PinStatus.success) {
-                                      await _savePin();
-                                    }
-                                  }
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: context.colorScheme.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              textStyle: context.textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            child: Text(
-                              AppConstants.pinSetupContinue,
-                              style: TextStyle(
-                                color: context.colorScheme.onPrimary,
-                              ),
-                            ),
-                          ),
+                          child: isSetting
+                              ? ElevatedButton(
+                                  onPressed: isNextEnabled
+                                      ? () {
+                                          // Move to confirm step
+                                          ref
+                                              .read(pinStateProvider.notifier)
+                                              .submitPin();
+                                        }
+                                      : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        context.colorScheme.primary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    textStyle: context.textTheme.titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  child: Text(
+                                    'Next',
+                                    style: TextStyle(
+                                      color: context.colorScheme.onPrimary,
+                                    ),
+                                  ),
+                                )
+                              : ElevatedButton(
+                                  onPressed: isContinueEnabled
+                                      ? () async {
+                                          ref
+                                              .read(pinStateProvider.notifier)
+                                              .submitPin();
+                                          final pinStateNow = ref.read(
+                                            pinStateProvider,
+                                          );
+                                          if (pinStateNow.status ==
+                                              PinStatus.success) {
+                                            await _savePin();
+                                          } else if (pinStateNow.status ==
+                                                  PinStatus.verifying &&
+                                              !pinStateNow.doPinsMatch) {
+                                            context.showSnackBar(
+                                              AppConstants.pinMismatchMessage,
+                                              isError: true,
+                                            );
+                                            ref
+                                                .read(pinStateProvider.notifier)
+                                                .reset();
+                                            ref
+                                                .read(pinStateProvider.notifier)
+                                                .startPinSetup();
+                                          }
+                                        }
+                                      : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        context.colorScheme.primary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    textStyle: context.textTheme.titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  child: Text(
+                                    AppConstants.pinSetupContinue,
+                                    style: TextStyle(
+                                      color: context.colorScheme.onPrimary,
+                                    ),
+                                  ),
+                                ),
                         ),
                         // if (isSetting)
                         //   TextButton(

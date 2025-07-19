@@ -79,6 +79,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, void>> setPin(String pin) async {
     try {
       await _localDataSource.setPin(pin);
+      await _localDataSource.setPinEnabled(true);
       await _localDataSource.setPinAttempts(0);
       return const Right(null);
     } catch (e) {
@@ -180,7 +181,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final userModel = await _remoteDataSource.getCurrentUser();
       if (userModel == null) return const Right(null);
 
-      final isPinSet = await _localDataSource.verifyPin('dummy') || false;
+      final isPinSet = await _localDataSource.isPinEnabled() || false;
       final isBiometricEnabled = await _localDataSource.isBiometricEnabled();
 
       final user = userModel.copyWith(

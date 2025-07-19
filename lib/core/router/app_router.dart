@@ -19,14 +19,15 @@ const String homeRoute = '/home';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
-  bool isBiomteric =
-      (ref.watch(biometricStateProvider).status == BiometricStatus.available);
+  final bioStatus = ref.watch(biometricStateProvider);
 
   return GoRouter(
     initialLocation: '/',
     redirect: (context, state) {
       final isAuthenticated = authState.status == AuthStatus.authenticated;
+      final bool isBiomteric = (bioStatus.status == BiometricStatus.available);
       final isPinSet = authState.isPinSet;
+      final isPinVerify = authState.isPinVerify;
       final isBiometricEnabled = authState.isBiometricEnabled;
 
       // If not authenticated, go to login
@@ -43,10 +44,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (isAuthenticated && isPinSet && !isBiometricEnabled && isBiomteric) {
         return biometricSetupRoute;
       }
-
-      // If authenticated and everything is set up, go to home
       if (isAuthenticated && isPinSet) {
-        return homeRoute;
+        return isPinVerify ? homeRoute : pinEntryRoute;
       }
 
       return null;
