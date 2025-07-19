@@ -159,7 +159,12 @@ class _PinSetupPageState extends ConsumerState<PinSetupPage> {
                               textStyle: context.textTheme.titleMedium
                                   ?.copyWith(fontWeight: FontWeight.bold),
                             ),
-                            child: Text(AppConstants.pinSetupContinue),
+                            child: Text(
+                              AppConstants.pinSetupContinue,
+                              style: TextStyle(
+                                color: context.colorScheme.onPrimary,
+                              ),
+                            ),
                           ),
                         ),
                         // if (isSetting)

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/extensions.dart';
 import '../providers/auth_provider.dart';
+import '../providers/biometric_provider.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -10,122 +11,186 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
+    final biometricState = ref.watch(biometricStateProvider);
+    final colorScheme = context.colorScheme;
+    final textTheme = context.textTheme;
 
     return Scaffold(
-      backgroundColor: context.colorScheme.background,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
         title: Text(AppConstants.appName),
-        backgroundColor: context.colorScheme.primary,
-        foregroundColor: context.colorScheme.onPrimary,
-        actions: [
-          IconButton(
-            onPressed: () => _showSettings(context, ref),
-            icon: const Icon(Icons.settings),
-          ),
-        ],
+        backgroundColor: colorScheme.background,
+        foregroundColor: colorScheme.onSurface,
+        elevation: 0,
+        centerTitle: true,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppConstants.defaultPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome section
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Avatar and Welcome
+                Center(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFD166),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.person,
+                            size: 48,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       Text(
-                        'Welcome!',
-                        style: context.textTheme.headlineSmall?.copyWith(
+                        AppConstants.loginWelcomeBack,
+                        style: textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: context.colorScheme.onSurface,
+                          color: colorScheme.onSurface,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Text(
-                        'You are successfully authenticated',
-                        style: context.textTheme.bodyLarge?.copyWith(
-                          color: context.colorScheme.onSurfaceVariant,
+                        authState.user?.email ?? '',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      if (authState.user != null) ...[
-                        const SizedBox(height: 8),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+                // Biometric toggle card
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            AppConstants.biometricNotAvailableMessage
+                                .replaceFirst(
+                                  'not available',
+                                  'Enable Biometric Authentication',
+                                ),
+                            style: textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                        Switch(
+                          value: biometricState.isEnabled,
+                          onChanged: (value) {
+                            ref
+                                .read(biometricStateProvider.notifier)
+                                .setEnabled(value);
+                          },
+                          activeColor: colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Change PIN card
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          'Email: ${authState.user!.email}',
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colorScheme.onSurfaceVariant,
+                          AppConstants.pinSetupTitle.replaceFirst(
+                            'Set',
+                            'Manage',
+                          ),
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // TODO: Navigate to Change PIN page
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                            ),
+                            child: Text(
+                              AppConstants.pinSetupContinue.replaceFirst(
+                                'Continue',
+                                'Change PIN',
+                              ),
+                              style: textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ],
-                    ],
+                    ),
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Security status
-              Text(
-                'Security Status',
-                style: context.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: context.colorScheme.onSurface,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      _buildSecurityItem(
-                        context,
-                        icon: Icons.pin,
-                        title: 'PIN Protection',
-                        subtitle: authState.isPinSet ? 'Enabled' : 'Not set up',
-                        isEnabled: authState.isPinSet,
+                const SizedBox(height: 32),
+                // Logout button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _signOut(context, ref),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFEF476F),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
                       ),
-                      const Divider(),
-                      _buildSecurityItem(
-                        context,
-                        icon: Icons.fingerprint,
-                        title: 'Biometric Authentication',
-                        subtitle: authState.isBiometricEnabled
-                            ? 'Enabled'
-                            : 'Not set up',
-                        isEnabled: authState.isBiometricEnabled,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      AppConstants.loginButtonSignIn.replaceFirst(
+                        'Login',
+                        'Logout',
                       ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const Spacer(),
-
-              // Sign out button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () => _signOut(context, ref),
-                  icon: const Icon(Icons.logout),
-                  label: const Text('Sign Out'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: context.colorScheme.error,
-                    foregroundColor: context.colorScheme.onError,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        AppConstants.defaultRadius,
+                      style: textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_auth/features/auth/presentation/providers/biometric_provider.dart';
 import 'package:go_router/go_router.dart';
 import '../constants/app_constants.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
@@ -18,6 +19,8 @@ const String homeRoute = '/home';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
+  bool isBiomteric =
+      (ref.watch(biometricStateProvider).status == BiometricStatus.available);
 
   return GoRouter(
     initialLocation: '/',
@@ -37,7 +40,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       }
 
       // If authenticated and PIN set but biometric not enabled, go to biometric setup
-      if (isAuthenticated && isPinSet && !isBiometricEnabled) {
+      if (isAuthenticated && isPinSet && !isBiometricEnabled && isBiomteric) {
         return biometricSetupRoute;
       }
 
