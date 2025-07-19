@@ -119,7 +119,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
         localizedReason: 'Please authenticate to access the app',
         options: const AuthenticationOptions(
           stickyAuth: true,
-          biometricOnly: true,
+          biometricOnly: false,
         ),
       );
 
