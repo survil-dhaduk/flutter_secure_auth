@@ -156,6 +156,7 @@ class HomePage extends ConsumerWidget {
                               ),
                               style: textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
+                                color: context.colorScheme.onPrimary,
                               ),
                             ),
                           ),
@@ -165,6 +166,7 @@ class HomePage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
+
                 // Logout button
                 SizedBox(
                   width: double.infinity,
@@ -185,6 +187,7 @@ class HomePage extends ConsumerWidget {
                       ),
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: context.colorScheme.onPrimary,
                       ),
                     ),
                   ),
