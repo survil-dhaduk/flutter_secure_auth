@@ -4,8 +4,6 @@ class AppConstants {
   static const String appVersion = '1.0.0';
 
   // Authentication
-  static const int pinLength = 4;
-  static const int maxPinAttempts = 3;
   static const int sessionTimeoutMinutes = 30;
 
   // Validation
@@ -22,7 +20,6 @@ class AppConstants {
       'Please enter a valid email address';
   static const String invalidPasswordMessage =
       'Password must be at least 8 characters';
-  static const String pinMismatchMessage = 'PINs do not match';
   static const String biometricNotAvailableMessage =
       'Biometric authentication not available';
   static const String biometricFailedMessage =
@@ -61,16 +58,5 @@ class AppConstants {
   static const String loginCreatingAccount = 'Creating account...';
   static const String loginSigningIn = 'Signing in...';
 
-  // PIN Setup Page Strings
-  static const String pinSetupTitle = 'Set PIN';
-  static const String pinSetupHeader = 'Set your 4-digit PIN';
-  static const String pinSetupDesc =
-      'You will use this to unlock the app and authorize transactions.';
-  static const String pinSetupEnterPin = 'Enter PIN';
-  static const String pinSetupConfirmPin = 'Confirm PIN';
-  static const String pinSetupContinue = 'Continue';
-  static const String pinSetupSkip = 'Skip for now';
-  static const String pinSetupCompleted = 'PIN setup completed!';
-  static const String pinSetupCreatePin = 'Create a 4-digit PIN';
-  static const String pinSetupReenterPin = 'Re-enter your PIN to confirm';
+  // PIN-related constants and strings removed
 }

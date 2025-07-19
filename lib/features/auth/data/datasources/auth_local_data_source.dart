@@ -4,22 +4,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/constants/storage_keys.dart';
 
 abstract class AuthLocalDataSource {
-  Future<void> setPin(String pin);
-  Future<bool> verifyPin(String pin);
   Future<void> setBiometricEnabled(bool enabled);
   Future<bool> isBiometricEnabled();
   Future<bool> authenticateWithBiometric();
   Future<void> clearLocalData();
   Future<void> setUserEmail(String email);
   Future<String?> getUserEmail();
-  Future<void> setPinAttempts(int attempts);
-  Future<int> getPinAttempts();
-  Future<void> setLastPinAttempt(DateTime time);
-  Future<DateTime?> getLastPinAttempt();
   Future<void> setAuthenticated(bool authenticated);
   Future<bool> isAuthenticated();
-  Future<void> setPinEnabled(bool enabled);
-  Future<bool> isPinEnabled();
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
@@ -34,47 +26,6 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   }) : _secureStorage = secureStorage,
        _localAuth = localAuth,
        _prefs = prefs;
-
-  @override
-  Future<void> setPin(String pin) async {
-    try {
-      await _secureStorage.write(key: StorageKeys.userPin, value: pin);
-    } catch (e) {
-      throw Exception('Failed to store PIN');
-    }
-  }
-
-  @override
-  Future<bool> verifyPin(String pin) async {
-    try {
-      final storedPin = await _secureStorage.read(key: StorageKeys.userPin);
-      return storedPin == pin;
-    } catch (e) {
-      throw Exception('Failed to verify PIN');
-    }
-  }
-
-  @override
-  Future<void> setPinEnabled(bool enabled) async {
-    try {
-      await _secureStorage.write(
-        key: StorageKeys.isPinSet,
-        value: enabled.toString(),
-      );
-    } catch (e) {
-      throw Exception('Failed to set PIN enabled status');
-    }
-  }
-
-  @override
-  Future<bool> isPinEnabled() async {
-    try {
-      final enabled = await _secureStorage.read(key: StorageKeys.isPinSet);
-      return enabled == 'true';
-    } catch (e) {
-      return false;
-    }
-  }
 
   @override
   Future<void> setBiometricEnabled(bool enabled) async {
@@ -125,7 +76,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
       return authenticated;
     } catch (e) {
-      throw Exception('Biometric authentication failed: ${e.toString()}');
+      throw Exception('Biometric authentication failed:  [${e.toString()}');
     }
   }
 
@@ -152,47 +103,6 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   Future<String?> getUserEmail() async {
     try {
       return _prefs.getString(StorageKeys.userEmail);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  @override
-  Future<void> setPinAttempts(int attempts) async {
-    try {
-      await _prefs.setInt(StorageKeys.pinAttempts, attempts);
-    } catch (e) {
-      throw Exception('Failed to store PIN attempts');
-    }
-  }
-
-  @override
-  Future<int> getPinAttempts() async {
-    try {
-      return _prefs.getInt(StorageKeys.pinAttempts) ?? 0;
-    } catch (e) {
-      return 0;
-    }
-  }
-
-  @override
-  Future<void> setLastPinAttempt(DateTime time) async {
-    try {
-      await _prefs.setString(
-        StorageKeys.lastPinAttempt,
-        time.toIso8601String(),
-      );
-    } catch (e) {
-      throw Exception('Failed to store last PIN attempt');
-    }
-  }
-
-  @override
-  Future<DateTime?> getLastPinAttempt() async {
-    try {
-      final timeString = _prefs.getString(StorageKeys.lastPinAttempt);
-      if (timeString == null) return null;
-      return DateTime.parse(timeString);
     } catch (e) {
       return null;
     }

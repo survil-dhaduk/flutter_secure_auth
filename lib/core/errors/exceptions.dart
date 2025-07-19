@@ -33,12 +33,3 @@ class BiometricException implements Exception {
   @override
   String toString() => 'BiometricException: $message';
 }
-
-class PinException implements Exception {
-  final String message;
-
-  const PinException(this.message);
-
-  @override
-  String toString() => 'PinException: $message';
-}

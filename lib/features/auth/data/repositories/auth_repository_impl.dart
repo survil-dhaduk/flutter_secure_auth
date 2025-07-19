@@ -29,17 +29,11 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       await _localDataSource.setUserEmail(email);
       await _localDataSource.setAuthenticated(true);
-
-      // Check if user has PIN set
-      final isPinSet = await _localDataSource.verifyPin('dummy') || false;
       final isBiometricEnabled = await _localDataSource.isBiometricEnabled();
-
       final user = userModel.copyWith(
-        isPinSet: isPinSet,
         isBiometricEnabled: isBiometricEnabled,
         lastLoginAt: DateTime.now(),
       );
-
       return Right(user);
     } catch (e) {
       return Left(AuthFailure(e.toString()));
@@ -72,59 +66,6 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Right(null);
     } catch (e) {
       return Left(AuthFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> setPin(String pin) async {
-    try {
-      await _localDataSource.setPin(pin);
-      await _localDataSource.setPinEnabled(true);
-      await _localDataSource.setPinAttempts(0);
-      return const Right(null);
-    } catch (e) {
-      return Left(StorageFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, bool>> verifyPin(String pin) async {
-    try {
-      // Check if too many attempts
-      final attempts = await _localDataSource.getPinAttempts();
-      final lastAttempt = await _localDataSource.getLastPinAttempt();
-
-      if (attempts >= AppConstants.maxPinAttempts) {
-        if (lastAttempt != null) {
-          final timeSinceLastAttempt = DateTime.now().difference(lastAttempt);
-          if (timeSinceLastAttempt.inMinutes < 15) {
-            return Left(PinFailure(AppConstants.tooManyAttemptsMessage));
-          } else {
-            // Reset attempts after 15 minutes
-            await _localDataSource.setPinAttempts(0);
-          }
-        }
-      }
-
-      final isValid = await _localDataSource.verifyPin(pin);
-
-      if (isValid) {
-        await _localDataSource.setPinAttempts(0);
-        await _localDataSource.setAuthenticated(true);
-        return const Right(true);
-      } else {
-        final newAttempts = attempts + 1;
-        await _localDataSource.setPinAttempts(newAttempts);
-        await _localDataSource.setLastPinAttempt(DateTime.now());
-
-        if (newAttempts >= AppConstants.maxPinAttempts) {
-          return Left(PinFailure(AppConstants.tooManyAttemptsMessage));
-        }
-
-        return const Right(false);
-      }
-    } catch (e) {
-      return Left(StorageFailure(e.toString()));
     }
   }
 
@@ -180,15 +121,8 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final userModel = await _remoteDataSource.getCurrentUser();
       if (userModel == null) return const Right(null);
-
-      final isPinSet = await _localDataSource.isPinEnabled() || false;
       final isBiometricEnabled = await _localDataSource.isBiometricEnabled();
-
-      final user = userModel.copyWith(
-        isPinSet: isPinSet,
-        isBiometricEnabled: isBiometricEnabled,
-      );
-
+      final user = userModel.copyWith(isBiometricEnabled: isBiometricEnabled);
       return Right(user);
     } catch (e) {
       return Left(AuthFailure(e.toString()));

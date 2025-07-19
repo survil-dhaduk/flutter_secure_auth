@@ -11,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dartz/dartz.dart';
 
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
 
@@ -18,17 +19,13 @@ class AuthState extends Equatable {
   final AuthStatus status;
   final app_user.User? user;
   final String? errorMessage;
-  final bool isPinSet;
   final bool isBiometricEnabled;
-  final bool isPinVerify;
 
   const AuthState({
     required this.status,
     this.user,
     this.errorMessage,
-    this.isPinSet = false,
     this.isBiometricEnabled = false,
-    this.isPinVerify = false,
   });
 
   factory AuthState.initial() {
@@ -39,29 +36,18 @@ class AuthState extends Equatable {
     AuthStatus? status,
     app_user.User? user,
     String? errorMessage,
-    bool? isPinSet,
     bool? isBiometricEnabled,
-    bool? isPinVerify,
   }) {
     return AuthState(
       status: status ?? this.status,
       user: user ?? this.user,
       errorMessage: errorMessage,
-      isPinSet: isPinSet ?? this.isPinSet,
       isBiometricEnabled: isBiometricEnabled ?? this.isBiometricEnabled,
-      isPinVerify: isPinVerify ?? this.isPinVerify,
     );
   }
 
   @override
-  List<Object?> get props => [
-    status,
-    user,
-    errorMessage,
-    isPinSet,
-    isBiometricEnabled,
-    isPinVerify,
-  ];
+  List<Object?> get props => [status, user, errorMessage, isBiometricEnabled];
 }
 
 // Providers
@@ -160,7 +146,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
           state = state.copyWith(
             status: AuthStatus.authenticated,
             user: user,
-            isPinSet: user.isPinSet,
             isBiometricEnabled: user.isBiometricEnabled,
           );
         } else {
@@ -184,7 +169,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       (user) => state = state.copyWith(
         status: AuthStatus.authenticated,
         user: user,
-        isPinSet: user.isPinSet,
         isBiometricEnabled: user.isBiometricEnabled,
       ),
     );
@@ -219,44 +203,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
-  Future<void> setPin(String pin) async {
-    if (_repository == null) return;
-    final result = await _repository?.setPin(pin);
-
-    result?.fold(
-      (failure) => state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: failure.message,
-      ),
-      (_) => state = state.copyWith(isPinSet: true),
-    );
-  }
-
-  Future<void> verifyPin(String pin) async {
-    if (_repository == null) return;
-    final result = await _repository!.verifyPin(pin);
-
-    result.fold(
-      (failure) => state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: failure.message,
-      ),
-      (isValid) {
-        if (isValid) {
-          state = state.copyWith(
-            status: AuthStatus.authenticated,
-            isPinVerify: true,
-          );
-        } else {
-          state = state.copyWith(
-            status: AuthStatus.error,
-            errorMessage: 'Invalid PIN',
-          );
-        }
-      },
-    );
-  }
-
   Future<void> enableBiometric() async {
     if (_repository == null) return;
     final result = await _repository!.enableBiometric();
@@ -270,26 +216,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
-  Future<void> authenticateWithBiometric() async {
-    if (_repository == null) return;
-    final result = await _repository!.authenticateWithBiometric();
-
-    result.fold(
-      (failure) => state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: failure.message,
-      ),
-      (isAuthenticated) {
-        if (isAuthenticated) {
-          state = state.copyWith(status: AuthStatus.authenticated);
-        } else {
-          state = state.copyWith(
-            status: AuthStatus.error,
-            errorMessage: 'Biometric authentication failed',
-          );
-        }
-      },
-    );
+  Future<Either<Failure, bool>> authenticateWithBiometric() async {
+    if (_repository == null)
+      return left(AuthFailure('Repository not initialized'));
+    return await _repository!.authenticateWithBiometric();
   }
 
   Future<void> signOut() async {
@@ -306,7 +236,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       (_) => state = state.copyWith(
         status: AuthStatus.unauthenticated,
         user: null,
-        isPinSet: false,
+
         isBiometricEnabled: false,
       ),
     );

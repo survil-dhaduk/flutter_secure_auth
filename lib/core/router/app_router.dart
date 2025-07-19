@@ -2,18 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_auth/features/auth/presentation/providers/biometric_provider.dart';
 import 'package:go_router/go_router.dart';
-import '../constants/app_constants.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/auth/presentation/pages/pin_setup_page.dart';
-import '../../features/auth/presentation/pages/pin_entry_page.dart';
-import '../../features/auth/presentation/pages/biometric_setup_page.dart';
 import '../../features/auth/presentation/pages/home_page.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 
 // Constants for route names
 const String loginRoute = '/login';
-const String pinSetupRoute = '/pin-setup';
-const String pinEntryRoute = '/pin-entry';
 const String biometricSetupRoute = '/biometric-setup';
 const String homeRoute = '/home';
 
@@ -25,9 +19,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/',
     redirect: (context, state) {
       final isAuthenticated = authState.status == AuthStatus.authenticated;
-      final bool isBiomteric = (bioStatus.status == BiometricStatus.available);
-      final isPinSet = authState.isPinSet;
-      final isPinVerify = authState.isPinVerify;
+      final bool isBiometricAvailable =
+          (bioStatus.status == BiometricStatus.available);
       final isBiometricEnabled = authState.isBiometricEnabled;
 
       // If not authenticated, go to login
@@ -35,35 +28,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return loginRoute;
       }
 
-      // If authenticated but PIN not set, go to PIN setup
-      if (isAuthenticated && !isPinSet) {
-        return pinSetupRoute;
-      }
-
-      // If authenticated and PIN set but biometric not enabled, go to biometric setup
-      if (isAuthenticated && isPinSet && !isBiometricEnabled && isBiomteric) {
-        return biometricSetupRoute;
-      }
-      if (isAuthenticated && isPinSet) {
-        return isPinVerify ? homeRoute : pinEntryRoute;
+      // If authenticated and biometric enabled, go to home
+      if (isAuthenticated) {
+        return homeRoute;
       }
 
       return null;
     },
     routes: [
       GoRoute(path: loginRoute, builder: (context, state) => const LoginPage()),
-      GoRoute(
-        path: pinSetupRoute,
-        builder: (context, state) => const PinSetupPage(),
-      ),
-      GoRoute(
-        path: pinEntryRoute,
-        builder: (context, state) => const PinEntryPage(),
-      ),
-      GoRoute(
-        path: biometricSetupRoute,
-        builder: (context, state) => const BiometricSetupPage(),
-      ),
+
       GoRoute(path: homeRoute, builder: (context, state) => const HomePage()),
     ],
     errorBuilder: (context, state) => Scaffold(

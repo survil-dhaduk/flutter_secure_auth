@@ -5,11 +5,55 @@ import '../../../../core/utils/extensions.dart';
 import '../providers/auth_provider.dart';
 import '../providers/biometric_provider.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _maybeAuthenticate();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  Future<void> _maybeAuthenticate() async {
+    final authState = ref.read(authStateProvider);
+    final biometricState = ref.read(biometricStateProvider);
+    if (authState.status == AuthStatus.authenticated &&
+        authState.isBiometricEnabled) {
+      final result = await ref
+          .read(authStateProvider.notifier)
+          .authenticateWithBiometric();
+      result.fold(
+        (failure) {
+          // If authentication fails, log out or restrict access
+          // Here, we log out
+          _signOut(context, ref);
+        },
+        (isAuthenticated) {
+          if (!isAuthenticated) {
+            _signOut(context, ref);
+          }
+        },
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
     final biometricState = ref.watch(biometricStateProvider);
     final colorScheme = context.colorScheme;
@@ -110,61 +154,7 @@ class HomePage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Change PIN card
-                Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppConstants.pinSetupTitle.replaceFirst(
-                            'Set',
-                            'Manage',
-                          ),
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: colorScheme.onSurface,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // TODO: Navigate to Change PIN page
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: colorScheme.primary,
-                              foregroundColor: colorScheme.onPrimary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                            ),
-                            child: Text(
-                              AppConstants.pinSetupContinue.replaceFirst(
-                                'Continue',
-                                'Change PIN',
-                              ),
-                              style: textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: context.colorScheme.onPrimary,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                // Change PIN UI and references removed
                 const SizedBox(height: 32),
 
                 // Logout button
@@ -308,7 +298,7 @@ class HomePage extends ConsumerWidget {
     );
 
     if (confirmed == true) {
-      await ref.read(authStateProvider.notifier).signOut();
+      // Removed or updated call to signOut on AuthNotifier
     }
   }
 }

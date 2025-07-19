@@ -5,7 +5,6 @@ import '../../features/auth/domain/entities/user.dart';
 // Authentication types
 typedef AuthResult = Either<Failure, void>;
 typedef AuthUserResult = Either<Failure, User>;
-typedef PinResult = Either<Failure, bool>;
 typedef BiometricResult = Either<Failure, bool>;
 
 // Validation types

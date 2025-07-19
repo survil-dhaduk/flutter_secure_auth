@@ -44,7 +44,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           next.errorMessage ?? 'An error occurred',
           isError: true,
         );
-        ref.read(authStateProvider.notifier).clearError();
       }
     });
 
@@ -260,41 +259,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          // // PIN login button
-                          // SizedBox(
-                          //   height: 48,
-                          //   child: OutlinedButton(
-                          //     onPressed: () {
-                          //       context.push(pinEntryRoute);
-                          //     },
-                          //     style: OutlinedButton.styleFrom(
-                          //       backgroundColor: colorScheme.surface,
-                          //       foregroundColor: colorScheme.secondary,
-                          //       side: BorderSide(
-                          //         color: colorScheme.outlineVariant,
-                          //       ),
-                          //       shape: RoundedRectangleBorder(
-                          //         borderRadius: BorderRadius.circular(16),
-                          //       ),
-                          //       textStyle: textTheme.titleMedium?.copyWith(
-                          //         fontWeight: FontWeight.bold,
-                          //       ),
-                          //     ),
-                          //     child: Row(
-                          //       mainAxisAlignment: MainAxisAlignment.center,
-                          //       children: [
-                          //         Icon(
-                          //           Icons.fiber_manual_record,
-                          //           color: colorScheme.secondary,
-                          //           size: 20,
-                          //         ),
-                          //         const SizedBox(width: 8),
-                          //         const Text(AppConstants.loginPinButton),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
-                          // const SizedBox(height: 16),
                           // Toggle sign up/sign in
                           Center(
                             child: GestureDetector(

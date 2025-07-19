@@ -5,7 +5,6 @@ class UserModel extends User {
   const UserModel({
     required super.id,
     required super.email,
-    super.isPinSet = false,
     super.isBiometricEnabled = false,
     super.lastLoginAt,
     required super.createdAt,
@@ -15,7 +14,6 @@ class UserModel extends User {
     return UserModel(
       id: json['id'] as String,
       email: json['email'] as String,
-      isPinSet: json['isPinSet'] as bool? ?? false,
       isBiometricEnabled: json['isBiometricEnabled'] as bool? ?? false,
       lastLoginAt: json['lastLoginAt'] != null
           ? DateTime.parse(json['lastLoginAt'] as String)
@@ -36,7 +34,6 @@ class UserModel extends User {
     return {
       'id': id,
       'email': email,
-      'isPinSet': isPinSet,
       'isBiometricEnabled': isBiometricEnabled,
       'lastLoginAt': lastLoginAt?.toIso8601String(),
       'createdAt': createdAt.toIso8601String(),
@@ -46,7 +43,6 @@ class UserModel extends User {
   UserModel copyWith({
     String? id,
     String? email,
-    bool? isPinSet,
     bool? isBiometricEnabled,
     DateTime? lastLoginAt,
     DateTime? createdAt,
@@ -54,7 +50,6 @@ class UserModel extends User {
     return UserModel(
       id: id ?? this.id,
       email: email ?? this.email,
-      isPinSet: isPinSet ?? this.isPinSet,
       isBiometricEnabled: isBiometricEnabled ?? this.isBiometricEnabled,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       createdAt: createdAt ?? this.createdAt,
@@ -65,7 +60,6 @@ class UserModel extends User {
   List<Object?> get props => [
     id,
     email,
-    isPinSet,
     isBiometricEnabled,
     lastLoginAt,
     createdAt,

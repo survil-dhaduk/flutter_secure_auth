@@ -32,7 +32,3 @@ class ValidationFailure extends Failure {
 class BiometricFailure extends Failure {
   const BiometricFailure(String message) : super(message);
 }
-
-class PinFailure extends Failure {
-  const PinFailure(String message) : super(message);
-}
