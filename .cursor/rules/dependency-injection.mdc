@@ -1,0 +1,184 @@
+# Dependency Injection Guidelines using Riverpod
+
+## Overview
+This project uses **Riverpod** for dependency injection and state management, replacing GetIt's service locator pattern.
+
+- Modular, composable providers per feature
+- Providers are lazily initialized
+- Enables clean, testable architecture
+
+## Main Structure
+
+Replace the centralized `injection_container.dart` with modular provider files:
+
+lib/
+├── core/
+│   └── providers/
+│       └── dio_provider.dart
+├── features/
+│   └── auth/
+│       ├── data/
+│       ├── domain/
+│       ├── application/
+│       └── auth_providers.dart
+
+
+---
+
+## External Dependencies
+
+### `lib/core/providers/dio_provider.dart`
+```dart
+final dioProvider = Provider<Dio>((ref) {
+  final dio = Dio();
+  // Add interceptors if needed
+  return dio;
+});
+Feature Injection Pattern
+lib/features/auth/auth_providers.dart
+dart
+Copy
+Edit
+// Data Source
+final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
+  return AuthRemoteDataSourceImpl(dio: ref.watch(dioProvider));
+});
+
+// Repository
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return AuthRepositoryImpl(remoteDataSource: ref.watch(authRemoteDataSourceProvider));
+});
+
+// Use Cases
+final loginUseCaseProvider = Provider<LoginUseCase>((ref) {
+  return LoginUseCase(repository: ref.watch(authRepositoryProvider));
+});
+
+final signUpUseCaseProvider = Provider<SignUpUseCase>((ref) {
+  return SignUpUseCase(repository: ref.watch(authRepositoryProvider));
+});
+
+final getUserUseCaseProvider = Provider<GetUserUseCase>((ref) {
+  return GetUserUseCase(repository: ref.watch(authRepositoryProvider));
+});
+Registration Types
+Singleton (Lazy-loaded)
+dart
+Copy
+Edit
+final myServiceProvider = Provider<MyService>((ref) {
+  return MyServiceImpl();
+});
+Factory (Fresh instance)
+dart
+Copy
+Edit
+final myFactoryProvider = Provider.autoDispose<MyService>((ref) {
+  return MyServiceImpl();
+});
+Dependency Order
+Register dependencies in this order:
+
+External (e.g., Dio, SharedPreferences)
+
+Data Sources
+
+Repositories
+
+Use Cases
+
+State Notifiers / ViewModels
+
+Usage in Code
+In Use Cases
+dart
+Copy
+Edit
+class LoginUseCase {
+  final AuthRepository _repository;
+
+  LoginUseCase({required AuthRepository repository})
+      : _repository = repository;
+}
+In Notifiers (instead of BLoCs)
+dart
+Copy
+Edit
+final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  return AuthNotifier(
+    loginUseCase: ref.watch(loginUseCaseProvider),
+    signUpUseCase: ref.watch(signUpUseCaseProvider),
+  );
+});
+dart
+Copy
+Edit
+class AuthNotifier extends StateNotifier<AuthState> {
+  final LoginUseCase _loginUseCase;
+  final SignUpUseCase _signUpUseCase;
+
+  AuthNotifier({
+    required LoginUseCase loginUseCase,
+    required SignUpUseCase signUpUseCase,
+  })  : _loginUseCase = loginUseCase,
+        _signUpUseCase = signUpUseCase,
+        super(AuthInitial());
+
+  // handle login, signup etc.
+}
+In Main App
+dart
+Copy
+Edit
+return ProviderScope(
+  child: MaterialApp(
+    home: MyHomePage(),
+  ),
+);
+In UI
+dart
+Copy
+Edit
+Consumer(
+  builder: (context, ref, _) {
+    final authState = ref.watch(authNotifierProvider);
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+
+    return ElevatedButton(
+      onPressed: () => authNotifier.login(...),
+      child: Text('Login'),
+    );
+  },
+);
+Testing with Riverpod
+dart
+Copy
+Edit
+final container = ProviderContainer(overrides: [
+  authRepositoryProvider.overrideWithValue(MockAuthRepository()),
+]);
+
+final useCase = container.read(loginUseCaseProvider);
+expect(useCase, isA<LoginUseCase>());
+dart
+Copy
+Edit
+tearDown(() {
+  container.dispose();
+});
+Best Practices
+Use Provider for stateless services (Repositories, UseCases)
+
+Use StateNotifierProvider or NotifierProvider for stateful logic
+
+Group providers by feature
+
+Prefer .autoDispose for short-lived objects
+
+Test using ProviderContainer and .overrideWithValue()
+
+Avoid context-based dependency access – use ref.watch/ref.read
+
+description: Riverpod-based DI setup for modular and testable Flutter apps
+globs:
+alwaysApply: false

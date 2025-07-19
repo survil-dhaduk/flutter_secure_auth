@@ -1,0 +1,56 @@
+---
+description: Riverpod + Clean Architecture Flutter Project Structure
+globs:
+alwaysApply: false
+---
+
+lib/
+├── core/
+│   ├── error/
+│   │   └── failure.dart
+│   ├── usecases/
+│   │   └── usecase.dart
+│   ├── network/
+│   │   └── network_info.dart
+│   ├── constants/
+│   │   └── app_strings.dart
+│   ├── utils/
+│   │   └── validators.dart
+│   └── widgets/
+│       └── loading_widget.dart
+│
+├── features/
+│   └── product_details/
+│       ├── data/
+│       │   ├── datasources/
+│       │   │   └── product_details_remote_data_source.dart
+│       │   ├── models/
+│       │   │   └── product_model.dart
+│       │   └── repositories/
+│       │       └── product_details_repository_impl.dart
+│       │
+│       ├── domain/
+│       │   ├── entities/
+│       │   │   └── product.dart
+│       │   ├── repositories/
+│       │   │   └── product_details_repository.dart
+│       │   └── usecases/
+│       │       └── get_product_details.dart
+│       │
+│       ├── application/
+│       │   ├── product_details_notifier.dart
+│       │   └── product_details_state.dart
+│       │
+│       ├── presentation/
+│       │   ├── pages/
+│       │   │   └── product_details_screen.dart
+│       │   └── widgets/
+│       │       └── product_info_widget.dart
+│       │
+│       └── product_details_providers.dart
+│
+├── core_providers/
+│   └── dio_provider.dart
+│
+├── main.dart
+└── app.dart

@@ -1,0 +1,28 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Color Usage from @/theme
+
+The application's color system is defined in [app_colors.dart](mdc:lib/shared/constants/app_colors.dart) and applied in the theme configuration in [app_theme.dart](mdc:lib/shared/theme/app_theme.dart).
+
+## How it works
+- All color constants (for both light and dark themes) are declared as static fields in the `AppColors` class in [app_colors.dart](mdc:lib/shared/constants/app_colors.dart).
+- The theme definitions in [app_theme.dart](mdc:lib/shared/theme/app_theme.dart) use these constants to configure `ThemeData` for both light and dark modes.
+- Example mapping:
+  - `AppColors.primaryLight` → `ColorScheme.light.primary`
+  - `AppColors.backgroundLight` → `ColorScheme.light.surface` and `scaffoldBackgroundColor`
+  - `AppColors.textLight` → `ColorScheme.light.onSurface` and `AppBarTheme.foregroundColor`
+  - `AppColors.primaryDark` → `ColorScheme.dark.primary`
+  - `AppColors.backgroundDark` → `ColorScheme.dark.surface` and `scaffoldBackgroundColor`
+  - `AppColors.textDark` → `ColorScheme.dark.onSurface` and `AppBarTheme.foregroundColor`
+
+## Usage Pattern
+- To add or update theme colors, edit the `AppColors` class.
+- To apply a color to a widget, use the theme (e.g., `Theme.of(context).colorScheme.primary`) or reference the color directly from `AppColors` if needed.
+- The theme is set up to use Material 3 and a custom font family.
+
+## References
+- [app_colors.dart](mdc:lib/shared/constants/app_colors.dart): All color constants
+- [app_theme.dart](mdc:lib/shared/theme/app_theme.dart): ThemeData configuration using AppColors
