@@ -25,7 +25,7 @@ class AuthState extends Equatable {
     required this.status,
     this.user,
     this.errorMessage,
-    this.isBiometricEnabled = false,
+    this.isBiometricEnabled = true,
   });
 
   factory AuthState.initial() {
@@ -203,7 +203,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
-  Future<void> enableBiometric() async {
+  Future<void> enableBiometric(bool enabled) async {
     if (_repository == null) return;
     final result = await _repository!.enableBiometric();
 
@@ -212,13 +212,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
         status: AuthStatus.error,
         errorMessage: failure.message,
       ),
-      (_) => state = state.copyWith(isBiometricEnabled: true),
+      (_) => state = state.copyWith(isBiometricEnabled: enabled),
     );
   }
 
   Future<Either<Failure, bool>> authenticateWithBiometric() async {
-    if (_repository == null)
+    if (_repository == null) {
       return left(AuthFailure('Repository not initialized'));
+    }
     return await _repository!.authenticateWithBiometric();
   }
 
@@ -226,9 +227,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (_repository == null) return;
     state = state.copyWith(status: AuthStatus.loading);
 
-    final result = await _repository!.signOut();
+    final result = await _repository?.signOut();
 
-    result.fold(
+    result?.fold(
       (failure) => state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: failure.message,

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_auth/features/auth/presentation/providers/biometric_provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/auth/presentation/pages/home_page.dart';
+import '../../features/home/presentation/home_page.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 
 // Constants for route names

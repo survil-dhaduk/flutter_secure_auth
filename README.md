@@ -29,35 +29,35 @@ This project follows **Clean Architecture** principles with **Riverpod** for sta
 lib/
 ├── core/                    # Core utilities and constants
 │   ├── constants/          # App constants and storage keys
-│   ├── errors/            # Failure and exception classes
-│   ├── utils/             # Validators and extensions
-│   └── types/             # Type definitions
+│   ├── errors/             # Failure and exception classes
+│   ├── utils/              # Validators and extensions
+│   └── types/              # Type definitions
 ├── features/auth/          # Authentication feature
-│   ├── data/              # Data layer
-│   │   ├── datasources/   # Remote and local data sources
-│   │   ├── models/        # Data models
-│   │   └── repositories/  # Repository implementations
-│   ├── domain/            # Domain layer
-│   │   ├── entities/      # Business entities
-│   │   ├── repositories/  # Repository interfaces
-│   │   └── usecases/      # Business logic use cases
-│   └── presentation/      # Presentation layer
-│       ├── providers/     # Riverpod state providers
-│       ├── pages/         # UI pages
-│       └── widgets/       # Reusable widgets
-└── main.dart              # App entry point
+│   ├── data/               # Data layer
+│   │   ├── datasources/    # Remote and local data sources
+│   │   ├── models/         # Data models
+│   │   └── repositories/   # Repository implementations
+│   ├── domain/             # Domain layer
+│   │   ├── entities/       # Business entities
+│   │   ├── repositories/   # Repository interfaces
+│   │   └── usecases/       # Business logic use cases
+│   └── presentation/       # Presentation layer
+│       ├── providers/      # Riverpod state providers
+│       ├── pages/          # UI pages
+│       └── widgets/        # Reusable widgets
+└── main.dart               # App entry point
 ```
 
 ## 🛠️ Tech Stack
 
-| Component | Package | Purpose |
-|-----------|---------|---------|
-| **State Management** | `flutter_riverpod` | Reactive state management |
-| **Authentication** | `firebase_auth` | Firebase authentication |
-| **Secure Storage** | `flutter_secure_storage` | Encrypted local storage |
-| **Biometrics** | `local_auth` | Fingerprint/Face ID |
-| **Navigation** | `go_router` | Declarative routing |
-| **Utilities** | `dartz`, `equatable` | Functional programming |
+| Component           | Package                   | Purpose                        |
+|---------------------|--------------------------|--------------------------------|
+| **State Management**| `flutter_riverpod`       | Reactive state management      |
+| **Authentication**  | `firebase_auth`          | Firebase authentication        |
+| **Secure Storage**  | `flutter_secure_storage` | Encrypted local storage        |
+| **Biometrics**      | `local_auth`             | Fingerprint/Face ID            |
+| **Navigation**      | `go_router`              | Declarative routing            |
+| **Utilities**       | `dartz`, `equatable`     | Functional programming         |
 
 ## 📱 User Flow
 
@@ -124,7 +124,7 @@ Login → Set PIN → Enable Biometrics? → Home
 
 ## 🧪 Testing
 
-The project includes comprehensive testing structure:
+The project includes a comprehensive testing structure:
 
 ```bash
 # Run unit tests
@@ -132,9 +132,6 @@ flutter test
 
 # Run widget tests
 flutter test test/widget_test.dart
-
-# Run integration tests
-flutter test integration_test/
 ```
 
 ## 📁 Project Structure

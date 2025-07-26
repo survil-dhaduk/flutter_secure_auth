@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/utils/extensions.dart';
-import '../providers/auth_provider.dart';
-import '../providers/biometric_provider.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/utils/extensions.dart';
+import '../../auth/presentation/providers/auth_provider.dart';
+import '../../auth/presentation/providers/biometric_provider.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -37,18 +37,18 @@ class _HomePageState extends ConsumerState<HomePage>
       final result = await ref
           .read(authStateProvider.notifier)
           .authenticateWithBiometric();
-      result.fold(
-        (failure) {
-          // If authentication fails, log out or restrict access
-          // Here, we log out
-          _signOut(context, ref);
-        },
-        (isAuthenticated) {
-          if (!isAuthenticated) {
-            _signOut(context, ref);
-          }
-        },
-      );
+      // result.fold(
+      //   (failure) {
+      //     // If authentication fails, log out or restrict access
+      //     // Here, we log out
+      //     _signOut(context, ref);
+      //   },
+      //   (isAuthenticated) {
+      //     if (!isAuthenticated) {
+      //       _signOut(context, ref);
+      //     }
+      //   },
+      // );
     }
   }
 
@@ -60,10 +60,10 @@ class _HomePageState extends ConsumerState<HomePage>
     final textTheme = context.textTheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         title: Text(AppConstants.appName),
-        backgroundColor: colorScheme.background,
+        backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
         elevation: 0,
         centerTitle: true,
@@ -141,11 +141,14 @@ class _HomePageState extends ConsumerState<HomePage>
                           ),
                         ),
                         Switch(
-                          value: biometricState.isEnabled,
+                          value: authState.isBiometricEnabled,
                           onChanged: (value) {
                             ref
                                 .read(biometricStateProvider.notifier)
                                 .setEnabled(value);
+                            ref
+                                .read(authStateProvider.notifier)
+                                .enableBiometric(value);
                           },
                           activeColor: colorScheme.primary,
                         ),
@@ -190,90 +193,6 @@ class _HomePageState extends ConsumerState<HomePage>
     );
   }
 
-  Widget _buildSecurityItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required bool isEnabled,
-  }) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          color: isEnabled
-              ? Colors.green
-              : context.colorScheme.onSurfaceVariant,
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: context.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: context.colorScheme.onSurface,
-                ),
-              ),
-              Text(
-                subtitle,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: context.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Icon(
-          isEnabled ? Icons.check_circle : Icons.circle_outlined,
-          color: isEnabled
-              ? Colors.green
-              : context.colorScheme.onSurfaceVariant,
-        ),
-      ],
-    );
-  }
-
-  void _showSettings(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.pin),
-              title: const Text('Change PIN'),
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to PIN change page
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.fingerprint),
-              title: const Text('Biometric Settings'),
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to biometric settings
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.security),
-              title: const Text('Security Settings'),
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to security settings
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Future<void> _signOut(BuildContext context, WidgetRef ref) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -286,7 +205,7 @@ class _HomePageState extends ConsumerState<HomePage>
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => ref.read(authStateProvider.notifier).signOut(),
             style: ElevatedButton.styleFrom(
               backgroundColor: context.colorScheme.error,
               foregroundColor: context.colorScheme.onError,
