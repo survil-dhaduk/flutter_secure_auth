@@ -61,7 +61,7 @@ lib/
 │       │   ├── models/                               # Data models (usually extend entities)
 │       │   │   └── user_model.dart                   # User model representing API response/data structure
 │       │   └── repositories/                         # Data layer implementations of domain repositories
-│       │       └── auth_repository_impl.dart # Implements `AuthRepository` interface
+│       │       └── auth_repository_impl.dart         # Implements `AuthRepository` interface
 │       ├── domain/                                   # Domain layer (business logic, entities, and use cases)
 │       │   ├── entities/                             # Core entities (pure data classes)
 │       │   │   └── user.dart                         # User entity for domain logic
