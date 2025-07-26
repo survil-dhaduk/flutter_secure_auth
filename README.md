@@ -22,7 +22,7 @@ A Flutter demo app showcasing secure authentication flows with local data manage
 - **Form Validation**: Real-time email and password validation
 
 ### Security Features
-- **4-Digit PIN Protection**: Secure PIN setup and verification
+- **PIN Protection**: Secure PIN setup and verification
 - **Biometric Authentication**: Fingerprint/Face ID support
 - **Secure Storage**: All sensitive data stored using `flutter_secure_storage`
 - **Session Management**: Persistent authentication across app restarts
@@ -110,9 +110,8 @@ Login → Enable Biometrics? → Home
 
 ### Authentication Flow
 1. **Login/Sign Up**: Email and password authentication via Firebase
-2. **PIN Setup**: First-time users set up a 4-digit PIN
-3. **Biometric Setup**: Optional biometric authentication setup
-4. **Home**: Main app interface with security status
+2. **Biometric Setup**: First-time users set up a Biometric
+3. **Home**: Main app interface with security status
 
 ### Security Features
 - **PIN Protection**: 3 failed attempts → redirect to login
