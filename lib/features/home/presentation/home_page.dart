@@ -31,12 +31,10 @@ class _HomePageState extends ConsumerState<HomePage>
 
   Future<void> _maybeAuthenticate() async {
     final authState = ref.read(authStateProvider);
-    final biometricState = ref.read(biometricStateProvider);
+    ref.read(biometricStateProvider);
     if (authState.status == AuthStatus.authenticated &&
         authState.isBiometricEnabled) {
-      final result = await ref
-          .read(authStateProvider.notifier)
-          .authenticateWithBiometric();
+      await ref.read(authStateProvider.notifier).authenticateWithBiometric();
       // result.fold(
       //   (failure) {
       //     // If authentication fails, log out or restrict access
@@ -55,7 +53,7 @@ class _HomePageState extends ConsumerState<HomePage>
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
-    final biometricState = ref.watch(biometricStateProvider);
+    ref.watch(biometricStateProvider);
     final colorScheme = context.colorScheme;
     final textTheme = context.textTheme;
 

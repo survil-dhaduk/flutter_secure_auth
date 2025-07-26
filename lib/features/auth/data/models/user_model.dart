@@ -1,4 +1,3 @@
-import 'package:equatable/equatable.dart';
 import '../../domain/entities/user.dart';
 
 class UserModel extends User {
@@ -40,6 +39,7 @@ class UserModel extends User {
     };
   }
 
+  @override
   UserModel copyWith({
     String? id,
     String? email,
