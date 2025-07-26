@@ -2,6 +2,18 @@
 
 A Flutter demo app showcasing secure authentication flows with local data management, featuring Firebase Auth, PIN protection, and biometric authentication.
 
+---
+
+**⚠️ Firebase Configuration Notice**
+
+> **This repository does NOT include Firebase configuration files.**
+>
+> To run this project, you must create your own Firebase project and add the required configuration files as described below.
+>
+> This is a demo showcase. For security and privacy, no Firebase credentials or configuration files are included in the repository.
+
+---
+
 ## 🚀 Features
 
 ### Core Authentication
@@ -62,7 +74,7 @@ lib/
 ## 📱 User Flow
 
 ```
-Login → Set PIN → Enable Biometrics? → Home
+Login → Enable Biometrics? → Home
     ↑                                    ↓
     ← 3 Failed PIN ← PIN Entry ← Biometric Prompt
 ```
@@ -83,7 +95,6 @@ Login → Set PIN → Enable Biometrics? → Home
 
 ### Prerequisites
 - Flutter SDK (3.8.0 or higher)
-- Firebase project setup
 - Android Studio / Xcode for mobile development
 
 ### Installation
@@ -99,13 +110,17 @@ Login → Set PIN → Enable Biometrics? → Home
    flutter pub get
    ```
 
-3. **Firebase Setup**
-   - Create a Firebase project
-   - Enable Authentication (Email/Password)
-   - Add your app to Firebase
-   - Download and add configuration files:
+3. **Firebase Setup (Required for Authentication)**
+   - Go to [Firebase Console](https://console.firebase.google.com/) and create a new project.
+   - Enable **Authentication** (Email/Password) in your Firebase project.
+   - Add your Android and/or iOS app to the Firebase project.
+   - Download the configuration files:
      - `google-services.json` for Android
      - `GoogleService-Info.plist` for iOS
+   - **Add these files to your project:**
+     - Place `google-services.json` in `android/app/`
+     - Place `GoogleService-Info.plist` in `ios/Runner/`
+   - **Note:** These files are NOT included in this repository. You must add your own.
 
 4. **Run the app**
    ```bash
