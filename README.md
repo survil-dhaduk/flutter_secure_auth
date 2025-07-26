@@ -39,54 +39,54 @@ This project follows **Clean Architecture** principles with **Riverpod** for sta
 
 ```
 lib/
-├── core/                                   # Core module containing app-wide constants, errors, utilities, and types
-│   ├── constants/                          # Constants used throughout the app
-│   │   ├── app_constants.dart              # General app constants (e.g., API base URL, timeout values)
-│   │   └── storage_keys.dart               # Keys for local storage (e.g., SharedPreferences, SecureStorage)
-│   ├── errors/                             # Error and failure handling
-│   │   ├── failures.dart                   # Failure classes representing app errors
-│   │   └── exceptions.dart                 # Custom exception classes (e.g., ServerException, CacheException)
-│   ├── utils/                              # Utility functions and extension methods
-│   │   ├── validators.dart                 # Input validators (e.g., email, password validation)
-│   │   └── extensions.dart                 # Dart extension methods (e.g., string or date extensions)
-│   └── types/                              # Common type definitions
-│       └── typedefs.dart                   # Type aliases for cleaner code (e.g., FutureEither type)
+├── core/                                             # Core module containing app-wide constants, errors, utilities, and types
+│   ├── constants/                                    # Constants used throughout the app
+│   │   ├── app_constants.dart                        # General app constants (e.g., API base URL, timeout values)
+│   │   └── storage_keys.dart                         # Keys for local storage (e.g., SharedPreferences, SecureStorage)
+│   ├── errors/                                       # Error and failure handling
+│   │   ├── failures.dart                             # Failure classes representing app errors
+│   │   └── exceptions.dart                           # Custom exception classes (e.g., ServerException, CacheException)
+│   ├── utils/                                        # Utility functions and extension methods
+│   │   ├── validators.dart                           # Input validators (e.g., email, password validation)
+│   │   └── extensions.dart                           # Dart extension methods (e.g., string or date extensions)
+│   └── types/                                        # Common type definitions
+│       └── typedefs.dart                             # Type aliases for cleaner code (e.g., FutureEither type)
 │
-├── features/                               # Feature-based structure (e.g., authentication feature)
-│   └── auth/                               # Authentication module
-│       ├── data/                           # Data layer (responsible for APIs, database, and repositories)
-│       │   ├── datasources/                # Data sources (remote APIs and local storage)
-│       │   │   ├── auth_remote_data_source.dart   # Handles remote API calls for auth (login, signup, etc.)
-│       │   │   └── biometric_local_data_source.dart # Handles biometric-related local storage
-│       │   ├── models/                     # Data models (usually extend entities)
-│       │   │   └── user_model.dart         # User model representing API response/data structure
-│       │   └── repositories/               # Data layer implementations of domain repositories
+├── features/                                         # Feature-based structure (e.g., authentication feature)
+│   └── auth/                                         # Authentication module
+│       ├── data/                                     # Data layer (responsible for APIs, database, and repositories)
+│       │   ├── datasources/                          # Data sources (remote APIs and local storage)
+│       │   │   ├── auth_remote_data_source.dart      # Handles remote API calls for auth (login, signup, etc.)
+│       │   │   └── biometric_local_data_source.dart  # Handles biometric-related local storage
+│       │   ├── models/                               # Data models (usually extend entities)
+│       │   │   └── user_model.dart                   # User model representing API response/data structure
+│       │   └── repositories/                         # Data layer implementations of domain repositories
 │       │       └── auth_repository_impl.dart # Implements `AuthRepository` interface
-│       ├── domain/                         # Domain layer (business logic, entities, and use cases)
-│       │   ├── entities/                   # Core entities (pure data classes)
-│       │   │   └── user.dart               # User entity for domain logic
-│       │   ├── repositories/               # Abstract repository contracts
-│       │   │   └── auth_repository.dart    # Defines authentication repository interface
-│       │   └── usecases/                   # Use cases for business logic
-│       │       ├── sign_in_with_email.dart # Use case for email sign-in
-│       │       ├── sign_up_with_email.dart # Use case for email sign-up
-│       │       ├── reset_password.dart     # Use case for password reset
-│       │       ├── setup_biometric.dart    # Use case for setting up biometrics
-│       │       ├── authenticate_biometric.dart # Use case for biometric authentication
-│       │       ├── check_biometric_status.dart # Use case to check biometric availability
-│       │       └── sign_out.dart           # Use case for signing out
-│       └── presentation/                   # Presentation layer (UI + State Management)
-│           ├── providers/                  # State management providers
-│           │   ├── auth_provider.dart      # Provider for authentication state and logic
-│           │   └── biometric_provider.dart # Provider for biometric state and logic
-│           ├── pages/                      # UI Pages (Screens)
-│           │   ├── login_page.dart         # Login screen
-│           │   └── forgot_password_page.dart # Forgot password screen
-│           └── widgets/                    # Reusable widgets
-│               ├── custom_text_field.dart  # Custom text field widget
-│               └── loading_overlay.dart    # Loading overlay widget (used during API calls)
-│
-└── main.dart                               # Entry point of the Flutter application
+│       ├── domain/                                   # Domain layer (business logic, entities, and use cases)
+│       │   ├── entities/                             # Core entities (pure data classes)
+│       │   │   └── user.dart                         # User entity for domain logic
+│       │   ├── repositories/                         # Abstract repository contracts
+│       │   │   └── auth_repository.dart              # Defines authentication repository interface
+│       │   └── usecases/                             # Use cases for business logic
+│       │       ├── sign_in_with_email.dart           # Use case for email sign-in
+│       │       ├── sign_up_with_email.dart           # Use case for email sign-up
+│       │       ├── reset_password.dart               # Use case for password reset
+│       │       ├── setup_biometric.dart              # Use case for setting up biometrics
+│       │       ├── authenticate_biometric.dart       # Use case for biometric authentication
+│       │       ├── check_biometric_status.dart       # Use case to check biometric availability
+│       │       └── sign_out.dart                     # Use case for signing out
+│       └── presentation/                             # Presentation layer (UI + State Management)
+│           ├── providers/                            # State management providers
+│           │   ├── auth_provider.dart                # Provider for authentication state and logic
+│           │   └── biometric_provider.dart           # Provider for biometric state and logic
+│           ├── pages/                                # UI Pages (Screens)
+│           │   ├── login_page.dart                   # Login screen
+│           │   └── forgot_password_page.dart         # Forgot password screen
+│           └── widgets/                              # Reusable widgets
+│               ├── custom_text_field.dart            # Custom text field widget
+│               └── loading_overlay.dart              # Loading overlay widget (used during API calls)
+│          
+└── main.dart                                         # Entry point of the Flutter application
 
 
 ## 🛠️ Tech Stack
