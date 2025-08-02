@@ -87,7 +87,7 @@ lib/
 │               └── loading_overlay.dart              # Loading overlay widget (used during API calls)
 │          
 └── main.dart                                         # Entry point of the Flutter application
-
+```
 
 ## 🛠️ Tech Stack
 
@@ -102,11 +102,11 @@ lib/
 
 ## 📱 User Flow
 
-```
+
 Login → Enable Biometrics? → Home
     ↑                                    ↓
     ← 3 Failed PIN ← PIN Entry ← Biometric Prompt
-```
+
 
 ### Authentication Flow
 1. **Login/Sign Up**: Email and password authentication via Firebase
